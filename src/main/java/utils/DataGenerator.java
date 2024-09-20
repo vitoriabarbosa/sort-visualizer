@@ -19,12 +19,12 @@ public class DataGenerator {
      * Gera um array de números inteiros aleatórios.
      *
      * @param numElements o número de elementos a serem gerados
-     * @return um array de números inteiros aleatórios
+     * @return um array de números inteiros aleatórios (positivos e negativos)
      */
     public static int[] randomNumbers(int numElements) {
         int[] array = new int[numElements];
         for (int i = 0; i < numElements; i++) {
-            array[i] = (int) (Math.random() * 101);
+            array[i] = (int) (Math.random() * 201) - 100;
         }
         return array;
     }
