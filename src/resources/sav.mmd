@@ -1,28 +1,3 @@
-# 📊 SAV (Sorting Algorithm Viewer)
-![Exemplo SAV](src/resources/img/sav.png)
-
-## 📋 Introdução
-O projeto visa desenvolver um **visor de algoritmos e ordenação**, um algorítmo que localiza os elementos de uma lista em uma certa ordem.
-
-## 🌟 Funcionalidades
-A ideia é poder mostrar visualmente como a lista **muda** em cada iteraçao, de acordo com o algoritmo de ordenação. Exemplo:
-
-![Exemplo SAV](src/resources/img/sorting.png)
-
-### 🧮 Ordenações utilizadas:
-- **Bubble Sort**: Pequenas e frequentes trocas de elementos adjacentes. A lista gradualmente se ordena de trás para frente.
-- **Insertion Sort**: Elementos são movidos e inseridos gradualmente na posição correta. A parte ordenada cresce à medida que o algoritmo avança.
-- **Quick Sort**: Segmentos da lista são ordenados em diferentes pontos, com partições visíveis onde o pivô divide a lista.
-- **Selection Sort**: O menor elemento é selecionado e trocado com o elemento na posição inicial da parte não ordenada da lista.
-
-### 🧱 Em construção:
-- No fim da ordenação, mostrar o tempo de execução até a ordenação da lista.
-- Ajustar o layout do painel de ordenação. (detalhes)
-- Melhorar visual do painel de controle.
-- Opção de pausar a ordenação. (?)
-
-## ⚙️ Diagrama de Classe
-```mermaid
 classDiagram
     direction LR
 
@@ -186,47 +161,3 @@ classDiagram
     SortController --> SortPanel : Uses
     SortViewerFrame --> ButtonUtil : Uses
     SortViewerFrame --> SortPanel : Uses
-
-```
-
-## 🛠️ Implementação
-- **Linguagem de Programação:** Java
-    - **Versão utilizada:** JDK 17
-- **Interface Gráfica:** Swing
-- **Controle de Versão:** Git
-
-## 📈 Ordenação Visual (Interface Gráfica)
-Agora você irá visualizar em tempo real os diferentes tipos de ordenação dos elementos (`Bubble Sort`, `Insertion Sort`, `Quick Sort`, `Seletion Sort`).
-
-### 🔝 Você deve entrar com os parâmetro via CLI!
-Abra o terminal e navegue até a pasta do projeto (caso não esteja), e execute os seguintes comandos:
-
-- #### Compilação:
-  Foi usado o arquivo `Makefile` para automatizar o processo de compilação. Para executá-lo basta por `make` no terminal.
-  ```bash
-    make
-  ```
-- #### Execução (Exemplo):
-    - aleatório (caracteres)
-      ```bash
-        java -cp out main.java.MainApp a=b t=c o=az in=r r=20 s=100
-      ```
-    
-    - aleatório (números)
-      ```bash
-        java -cp out main.java.MainApp a=q t=n o=az in=r r=50 s=100
-      ```
-    
-    - manual (caracteres)
-      ```bash
-        java -cp out main.java.MainApp a=s t=c o=za in=m v="H,r,x,C,Q,L,w,o,c,z,M,g,p,z,b,R,a,h" s=100
-      ```
-    
-    - manual (números)
-      ```bash
-        java -cp out main.java.MainApp a=i t=n o=za in=m v="-21,50,-3,2,7,17,23,-15,38,12,-4,47,31,0,-10" s=100
-      ```
-`Path: src/main/java/MainApp.java`
-
-## 📝 Licença
-Este projeto é licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
