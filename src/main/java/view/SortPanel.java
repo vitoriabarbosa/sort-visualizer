@@ -124,22 +124,44 @@ public class SortPanel extends JPanel {
 
             int x = LEFT_PADDING + i * (barWidth + barSpacing);
             int y;
-            if (value >= 0) y = zeroY - barHeight;
-            else y = zeroY;
+
+            // FontMetrics para obter a largura do texto
+            FontMetrics fm = g.getFontMetrics();
+            String textValue = isCharArray ? String.valueOf(((char[]) array)[i]) : String.valueOf(value);
+            int textWidth = fm.stringWidth(textValue);
+            int textX = x + (barWidth - textWidth) / 2; // Centraliza o texto horizontalmente
+
+            // Exibir a faixa preta e o texto na parte superior para valores positivos
+            if (value > 0) {
+                y = zeroY - barHeight;  // Para positivos, a barra cresce para cima
+
+                // Faixa preta acima da barra (para valores positivos)
+                g.setColor(Color.BLACK);
+                g.fillRect(x, y - 10, barWidth, 10);  // Faixa preta no topo da barra (posicionada acima)
+
+                // Texto centralizado para valores positivos
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Arial", Font.BOLD, 16));
+                g.drawString(textValue, textX, y - 15);  // Texto centralizado um pouco acima da faixa preta
+            }
+            // Exibir a faixa preta e o texto na parte inferior para valores negativos
+            else {
+                y = zeroY;  // Para negativos, a barra cresce para baixo
+
+                // Faixa preta abaixo da barra (para valores negativos)
+                g.setColor(Color.BLACK);
+                g.fillRect(x, y + barHeight, barWidth, 10);  // Faixa preta no final da barra
+
+                // Texto centralizado para valores negativos
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Arial", Font.BOLD, 16));
+                g.drawString(textValue, textX, y + barHeight + 25);  // Texto centralizado abaixo da faixa preta
+            }
 
             // Destaca a barra atual
             if (i == currentBar) g.setColor(Color.RED);
             else g.setColor(Color.decode("#CCCCCC"));
             g.fillRect(x, y, barWidth, barHeight);
-
-            g.setColor(Color.BLACK);
-            g.fillRect(x, y, barWidth, 10);
-
-            // Ajusta a posição do texto para garantir que ele esteja visível
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 16));
-            g.drawString(isCharArray ? String.valueOf(((char[]) array)[i])
-                    : String.valueOf(value), x + (barWidth / 2) - 5, y - 5);
         }
     }
 
