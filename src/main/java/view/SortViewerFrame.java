@@ -1,6 +1,10 @@
 package main.java.view;
 
 import main.java.controller.SortController;
+import main.java.utils.ButtonUtil;
+import main.java.utils.DataGenerator;
+import main.java.utils.InputValidator;
+import main.java.utils.SortHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,8 +23,6 @@ public class SortViewerFrame extends JFrame {
     private JComboBox<String> orderBox;
     private JTextField sizeField;
     private JTextField pauseField;
-    private JButton startButton;
-    private JButton menuButton;
 
     /**
      * Construtor para inicializar a janela do visualizador de ordenação.
@@ -30,44 +32,43 @@ public class SortViewerFrame extends JFrame {
         setTitle("Sorting Algorithm Viewer");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
 
         panel = new SortPanel();
+        panel.setBackground(Color.DARK_GRAY);
         add(panel, BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel();
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(controlPanel, BorderLayout.SOUTH);
 
         controlPanel.add(new JLabel("Número de Elementos:"));
-        sizeField = new JTextField("10", 5);
+        sizeField = new JTextField("20", 5);    // número de elementos "padrão"
         controlPanel.add(sizeField);
 
         algorithmBox = new JComboBox<>(new String[]{"Selection Sort (S)", "Bubble Sort (B)", "Insertion Sort (I)", "Quick Sort (Q)"});
         controlPanel.add(new JLabel("Algorítmos:"));
         controlPanel.add(algorithmBox);
 
-        typeBox = new JComboBox<>(new String[]{"Numérico (N)", "Caracter (C)"});
+        typeBox = new JComboBox<>(new String[]{"Numérico (N)", "Caractere (C)"});
         controlPanel.add(new JLabel("Tipo:"));
         controlPanel.add(typeBox);
 
-        orderBox = new JComboBox<>(new String[]{"Crescente (ZA)", "Decrescente (AZ)"});
+        orderBox = new JComboBox<>(new String[]{"Crescente (AZ)", "Decrescente (ZA)"});
         controlPanel.add(new JLabel("Ordem:"));
         controlPanel.add(orderBox);
 
-        pauseField = new JTextField("500", 5);
+        pauseField = new JTextField("100", 5);  // velocidade "padrão"
         controlPanel.add(new JLabel("Pausa (ms):"));
         controlPanel.add(pauseField);
 
-        startButton = new JButton("Start");
-        controlPanel.add(startButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        ButtonUtil startButton = new ButtonUtil("Start", e -> startSorting());
 
-        menuButton = new JButton("Menu");
-        controlPanel.add(menuButton);
-
-        startButton.addActionListener(e -> startSorting());
-
-        menuButton.addActionListener(e -> showMenu());
-
-        showMenu(); // Show menu on startup
+        buttonPanel.add(Box.createHorizontalStrut(40));
+        buttonPanel.add(startButton);
+        controlPanel.add(buttonPanel);
+        showMenu();
     }
 
     /**
@@ -95,82 +96,15 @@ public class SortViewerFrame extends JFrame {
             String type = typeField.getText().trim().toUpperCase();
             String order = orderField.getText().trim().toUpperCase();
 
-            if (!validateInput(algorithm, type, order)) {
+            if (!InputValidator.validateInput(algorithm, type, order)) {
                 JOptionPane.showMessageDialog(this, "Input inválido. Entre com os valores corretos.", "Error", JOptionPane.ERROR_MESSAGE);
                 showMenu();
                 return;
             }
 
-            algorithmBox.setSelectedItem(getAlgorithmFullName(algorithm));
-            typeBox.setSelectedItem(getTypeFullName(type));
-            orderBox.setSelectedItem(getOrderFullName(order));
-        }
-    }
-
-    /**
-     * Valida os valores inseridos pelo usuário para o algoritmo, tipo e ordem.
-     *
-     * @param algorithm o valor do algoritmo inserido.
-     * @param type o valor do tipo inserido.
-     * @param order o valor da ordem inserido.
-     * @return {@code true} se todos os valores forem válidos; {@code false} caso contrário.
-     */
-    private boolean validateInput(String algorithm, String type, String order) {
-        return (algorithm.matches("[SBIQ]") && type.matches("[NC]") && order.matches("AZ|ZA"));
-    }
-
-    /**
-     * Retorna o nome completo do algoritmo com base na abreviação fornecida.
-     *
-     * @param algorithm a abreviação do algoritmo.
-     * @return o nome completo do algoritmo.
-     */
-    private String getAlgorithmFullName(String algorithm) {
-        switch (algorithm) {
-            case "S":
-                return "Selection Sort (S)";
-            case "B":
-                return "Bubble Sort (B)";
-            case "I":
-                return "Insertion Sort (I)";
-            case "Q":
-                return "Quick Sort (Q)";
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Retorna o nome completo do tipo com base na abreviação fornecida.
-     *
-     * @param type a abreviação do tipo.
-     * @return o nome completo do tipo.
-     */
-    private String getTypeFullName(String type) {
-        switch (type) {
-            case "N":
-                return "Numérico (N)";
-            case "C":
-                return "Caracter (C)";
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Retorna o nome completo da ordem com base na abreviação fornecida.
-     *
-     * @param order a abreviação da ordem.
-     * @return o nome completo da ordem.
-     */
-    private String getOrderFullName(String order) {
-        switch (order) {
-            case "AZ":
-                return "Decrescente (AZ)";
-            case "ZA":
-                return "Crescente (ZA)";
-            default:
-                return null;
+            algorithmBox.setSelectedItem(InputValidator.getAlgorithmFullName(algorithm));
+            typeBox.setSelectedItem(InputValidator.getTypeFullName(type));
+            orderBox.setSelectedItem(InputValidator.getOrderFullName(order));
         }
     }
 
@@ -178,84 +112,33 @@ public class SortViewerFrame extends JFrame {
      * Inicia a ordenação com base nas configurações fornecidas pelo usuário e no tipo de dados selecionado.
      */
     private void startSorting() {
-        int numElements = Integer.parseInt(sizeField.getText());
-        int pauseDuration = Integer.parseInt(pauseField.getText());
-        String algorithm = (String) algorithmBox.getSelectedItem();
-        String type = (String) typeBox.getSelectedItem();
-        String order = (String) orderBox.getSelectedItem();
+        try {
+            int numElements = Integer.parseInt(sizeField.getText());
+            int pauseDuration = Integer.parseInt(pauseField.getText());
+            String algorithm = (String) algorithmBox.getSelectedItem();
+            String type = (String) typeBox.getSelectedItem();
+            String order = (String) orderBox.getSelectedItem();
 
-        control = new SortController(panel, pauseDuration, order);
+            control = new SortController(panel, pauseDuration, order);
+            SortHandler sortHandler = new SortHandler(control, panel);
 
-        if ("Numérico (N)".equals(type)) {
-            if (numElements > 1000) {
-                JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            if ("Numérico (N)".equals(type)) {
+                if (numElements > 100) {
+                    JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                int[] array = DataGenerator.randomNumbers(numElements);
+                sortHandler.sort(algorithm, array);
+            } else {
+                if (numElements > 100) {
+                    JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                char[] array = DataGenerator.randomChars(numElements);
+                sortHandler.sort(algorithm, array);
             }
-            int[] array = generateRandomNumbers(numElements);
-            panel.setIntArray(array);
-            switch (Objects.requireNonNull(algorithm)) {
-                case "Selection Sort (S)":
-                    control.selectionSort(array);
-                    break;
-                case "Bubble Sort (B)":
-                    control.bubbleSort(array);
-                    break;
-                case "Insertion Sort (I)":
-                    control.insertionSort(array);
-                    break;
-                case "Quick Sort (Q)":
-                    control.quickSort(array, 0, array.length - 1);
-                    break;
-            }
-        } else {
-            if (numElements > 1000) {
-                JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            char[] array = generateRandomChars(numElements);
-            panel.setCharArray(array);
-            switch (algorithm) {
-                case "Selection Sort (S)":
-                    control.selectionSort(array);
-                    break;
-                case "Bubble Sort (B)":
-                    control.bubbleSort(array);
-                    break;
-                case "Insertion Sort (I)":
-                    control.insertionSort(array);
-                    break;
-                case "Quick Sort (Q)":
-                    control.quickSort(array, 0, array.length - 1);
-                    break;
-            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Por favor, insira um número válido.", "Erro de Entrada", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    /**
-     * Gera um array de inteiros aleatórios com o número especificado de elementos.
-     *
-     * @param numElements o número de elementos no array.
-     * @return o array de inteiros aleatórios.
-     */
-    private int[] generateRandomNumbers(int numElements) {
-        int[] array = new int[numElements];
-        for (int i = 0; i < numElements; i++) {
-            array[i] = (int) (Math.random() * 100);
-        }
-        return array;
-    }
-
-    /**
-     * Gera um array de caracteres aleatórios com o número especificado de elementos.
-     *
-     * @param numElements o número de elementos no array.
-     * @return o array de caracteres aleatórios.
-     */
-    private char[] generateRandomChars(int numElements) {
-        char[] array = new char[numElements];
-        for (int i = 0; i < numElements; i++) {
-            array[i] = (char) (Math.random() * 26 + 'A');
-        }
-        return array;
     }
 }

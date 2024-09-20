@@ -26,7 +26,7 @@ public class SortController {
     public SortController(SortPanel panel, int pauseDuration, String order) {
         this.panel = panel;
         this.pauseDuration = pauseDuration;
-        this.ascending = "Ascending (ZA)".equals(order);
+        this.ascending = "Crescente (AZ)".equalsIgnoreCase(order) || "az".equalsIgnoreCase(order);
     }
 
     /**

@@ -9,11 +9,9 @@ import java.awt.image.BufferedImage;
  * Ela usa uma imagem em buffer para desenhar barras representando os valores dos arrays.
  */
 public class SortPanel extends JPanel {
-    private int[] intArray;
-    private char[] charArray;
+    private Object array;
     private boolean isCharArray;
     private BufferedImage buffer;
-    private final int barSpacing = 5;
     private int currentBar = -1;
 
     /**
@@ -22,7 +20,7 @@ public class SortPanel extends JPanel {
      * @param array o array de inteiros a ser exibido.
      */
     public void setIntArray(int[] array) {
-        this.intArray = array;
+        this.array = array;
         this.isCharArray = false;
         updateBuffer();
     }
@@ -33,7 +31,7 @@ public class SortPanel extends JPanel {
      * @param array o array de caracteres a ser exibido.
      */
     public void setCharArray(char[] array) {
-        this.charArray = array;
+        this.array = array;
         this.isCharArray = true;
         updateBuffer();
     }
@@ -64,81 +62,70 @@ public class SortPanel extends JPanel {
         int height = getHeight();
         buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = buffer.createGraphics();
-        if (isCharArray) {
-            if (charArray != null) {
-                drawArray(g2d, charArray);
-            }
-        } else {
-            if (intArray != null) {
-                drawArray(g2d, intArray);
-            }
+
+        if (array != null) {
+            drawArray(g2d, width, height);
         }
         g2d.dispose();
         repaint();
     }
 
     /**
-     * Desenha um array de inteiros no painel, onde cada valor é representado por uma barra.
+     * Desenha o array no painel, onde cada valor é representado por uma barra.
      *
      * @param g o objeto {@code Graphics} usado para desenhar.
-     * @param array o array de inteiros a ser desenhado.
+     * @param width a largura útil do painel.
+     * @param height a altura útil do painel.
      */
-    private void drawArray(Graphics g, int[] array) {
-        int width = getWidth();
-        int height = getHeight();
-        int barWidth = (width - (array.length - 1) * barSpacing) / array.length;
-        int maxHeight = getMaxValue(array);
+    private void drawArray(Graphics g, int width, int height) {
+        int length = isCharArray ? ((char[]) array).length : ((int[]) array).length;
+        int barSpacing = 3;
+        int barWidth = (width - (length - 1) * barSpacing) / length;
 
-        for (int i = 0; i < array.length; i++) {
-            int barHeight = (int) (((double) array[i] / maxHeight) * height);
+        // Define uma altura mínima para as barras
+        int minBarHeight = 5;
+        // Calcula o valor máximo e mínimo no array
+        int maxValue = isCharArray ? 26 : getMaxValue((int[]) array);
+        int minValue = isCharArray ? 0 : getMinValue((int[]) array);
+
+        for (int i = 0; i < length; i++) {
+            int value = isCharArray ? ((char[]) array)[i] - 'A' + 1 : ((int[]) array)[i];
+
+            int barHeight;
+            barHeight = (int) (((double) Math.abs(value) / maxValue) * ((double) height / 1.5));
+            barHeight = Math.max(barHeight, minBarHeight);
+
             int x = i * (barWidth + barSpacing);
             int y = height - barHeight;
 
             if (i == currentBar) {
                 g.setColor(Color.RED);
-            } else {
-                g.setColor(Color.decode("#CCCCCC"));
-            }
+            } else g.setColor(Color.decode("#CCCCCC"));
             g.fillRect(x, y, barWidth, barHeight);
 
             g.setColor(Color.BLACK);
-            g.fillRect(x, y, barWidth, 30);
+            g.fillRect(x, y, barWidth, 10);
 
+            // Ajusta a posição do texto para garantir que ele esteja visível
             g.setColor(Color.WHITE);
-            g.drawString(String.valueOf(array[i]), x + (barWidth / 2) - 5, y + 15);
+            g.setFont(new Font("Arial", Font.BOLD, 16));
+            g.drawString(isCharArray ? String.valueOf(((char[]) array)[i]) : String.valueOf(value),
+                    x + (barWidth / 2) - 5, y - 5);  // Ajusta a posição para evitar corte
         }
     }
 
     /**
-     * Desenha um array de caracteres no painel, onde cada caractere é representado por uma barra.
+     * Retorna o valor mínimo em um array de inteiros.
      *
-     * @param g o objeto {@code Graphics} usado para desenhar.
-     * @param array o array de caracteres a ser desenhado.
+     * @param array o array de inteiros.
+     * @return o valor mínimo no array.
      */
-    private void drawArray(Graphics g, char[] array) {
-        int width = getWidth();
-        int height = getHeight();
-        int barWidth = (width - (array.length - 1) * barSpacing) / array.length;
-        int maxHeight = getMaxValue(array);
-
-        for (int i = 0; i < array.length; i++) {
-            int barHeight = (int) (((double) (array[i] - 'A') / maxHeight) * height);
-            int x = i * (barWidth + barSpacing);
-            int y = height - barHeight;
-
-            if (i == currentBar) {
-                g.setColor(Color.RED);
-            } else {
-                g.setColor(Color.decode("#CCCCCC"));
-            }
-            g.fillRect(x, y, barWidth, barHeight);
-
-            g.setColor(Color.BLACK);
-            g.fillRect(x, y, barWidth, 30);
-
-            g.setColor(Color.WHITE);
-            g.drawString(String.valueOf(array[i]), x + (barWidth / 2) - 5, y + 15);
+    private int getMinValue(int[] array) {
+        int min = Integer.MAX_VALUE;
+        for (int value : array) {
+            if (value < min) min = value;
         }
+        return min;
     }
 
     /**
@@ -150,26 +137,8 @@ public class SortPanel extends JPanel {
     private int getMaxValue(int[] array) {
         int max = Integer.MIN_VALUE;
         for (int value : array) {
-            if (value > max) {
-                max = value;
-            }
+            if (value > max) max = value;
         }
         return max;
-    }
-
-    /**
-     * Retorna o valor máximo em um array de caracteres.
-     *
-     * @param array o array de caracteres.
-     * @return o valor máximo no array ajustado pela constante 'A'.
-     */
-    private int getMaxValue(char[] array) {
-        int max = Integer.MIN_VALUE;
-        for (char value : array) {
-            if (value > max) {
-                max = value;
-            }
-        }
-        return max - 'A';
     }
 }

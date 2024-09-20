@@ -57,7 +57,7 @@ public abstract class Sorting {
         try {
             Thread.sleep(pauseDuration);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
