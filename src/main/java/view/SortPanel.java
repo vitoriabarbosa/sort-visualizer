@@ -88,11 +88,11 @@ public class SortPanel extends JPanel {
         int barWidth = (usableWidth - (length - 1) * barSpacing) / length;
 
         // Define uma altura mínima para as barras
-        int minBarHeight = 5;
+        int minBarHeight = 10;
 
-        // Calcula o valor máximo e mínimo no array
-        int maxValue = isCharArray ? 26 : getMaxValue((int[]) array);
-        int minValue = isCharArray ? 0 : getMinValue((int[]) array);
+        // Ajuste para calcular valores máximos e mínimos para números e caracteres
+        int maxValue = isCharArray ? 51 : getMaxValue((int[]) array); // Máx 51 (a-z tem valor de 26-51)
+        int minValue = isCharArray ? 0 : getMinValue((int[]) array);  // Min para caractere 0 (A-Z tem valor 0-25)
 
         // Calcula o ponto central (zero) onde as barras negativas começam a crescer para baixo
         int zeroY = TOP_PADDING + usableHeight * maxValue / (maxValue - minValue);
@@ -102,7 +102,13 @@ public class SortPanel extends JPanel {
         g.drawLine(LEFT_PADDING, zeroY, LEFT_PADDING + usableWidth, zeroY);
 
         for (int i = 0; i < length; i++) {
-            int value = isCharArray ? ((char[]) array)[i] - 'A' + 1 : ((int[]) array)[i];
+            int value;
+
+            if (isCharArray) {
+                char c = ((char[]) array)[i];
+                if (Character.isUpperCase(c)) value = c - 'A' + 1;  // Valores de 1 a 26 para maiúsculas
+                else value = c - 'a' + 26 + 1;  // Valores de 26 a 52 para minúsculas
+            } else value = ((int[]) array)[i];
 
             if (!isCharArray) {
                 if (value == 0) {

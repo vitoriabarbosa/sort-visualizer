@@ -30,15 +30,21 @@ public class DataGenerator {
     }
 
     /**
-     * Gera um array de caracteres aleatórios.
+     * Gera um array de caracteres aleatórios, incluindo maiúsculas e minúsculas.
      *
      * @param numElements o número de elementos a serem gerados
-     * @return um array de caracteres aleatórios
+     * @return um array de caracteres aleatórios (maiúsculas e minúsculas)
      */
     public static char[] randomChars(int numElements) {
         char[] array = new char[numElements];
         for (int i = 0; i < numElements; i++) {
-            array[i] = (char) (StrictMath.random() * 26 + 'A');
+            if (Math.random() < 0.5) {
+                // Gera letras maiúsculas A-Z
+                array[i] = (char) (StrictMath.random() * 26 + 'A');
+            } else {
+                // Gera letras minúsculas a-z
+                array[i] = (char) (StrictMath.random() * 26 + 'a');
+            }
         }
         return array;
     }
