@@ -16,8 +16,9 @@ A ideia é poder mostrar visualmente como a lista **muda** em cada iteraçao, de
 - **Selection Sort**: O menor elemento é selecionado e trocado com o elemento na posição inicial da parte não ordenada da lista.
 
 ### 🧱 Em construção:
-- No fim da ordenação, mostrar o tempo de execução até a ordenação da lista.
+- No fim da ordenação, mostrar o tempo de execução até a ordenação da lista (sem contar com a pausa).
 - Ajustar o layout do painel de ordenação. (detalhes)
+- Exibir o array (em barras no SortPanel) de entrada, antes da ordenação.
 - Melhorar visual do painel de controle.
 - Opção de pausar a ordenação. (?)
 
@@ -30,6 +31,7 @@ classDiagram
         +static int[] randomNumbers(numElements: int): int[]
         +static char[] randomChars(numElements: int): char[]
     }
+
 
     class MainApp {
         +main(args: String[]): void
@@ -113,6 +115,8 @@ classDiagram
         +Sorting(panel: SortPanel, ascending: boolean, pauseDuration: int)
         +sort(array: int[])
         +sort(array: char[])
+        -executeSort(array: int[])
+        -executeSort(array: char[])
         -highlightBar(index: int)
         -sleep()
         -panel: SortPanel
@@ -124,24 +128,32 @@ classDiagram
         +BubbleSort(panel: SortPanel, ascending: boolean, pauseDuration: int)
         +sort(array: int[])
         +sort(array: char[])
+        -executeSort(array: int[])
+        -executeSort(array: char[])
     }
 
     class SelectionSort {
         +SelectionSort(panel: SortPanel, ascending: boolean, pauseDuration: int)
         +sort(array: int[])
         +sort(array: char[])
+        -executeSort(array: int[])
+        -executeSort(array: char[])
     }
 
     class InsertionSort {
         +InsertionSort(panel: SortPanel, ascending: boolean, pauseDuration: int)
         +sort(array: int[])
         +sort(array: char[])
+        -executeSort(array: int[])
+        -executeSort(array: char[])
     }
 
     class QuickSort {
         +QuickSort(panel: SortPanel, ascending: boolean, pauseDuration: int)
         +sort(array: int[])
         +sort(array: char[])
+        -executeSort(array: int[])
+        -executeSort(array: char[])
         -quickSortHelper(array: int[], low: int, high: int)
         -partition(array: int[], low: int, high: int): int
         -quickSortHelper(array: char[], low: int, high: int)
@@ -165,10 +177,11 @@ classDiagram
         -currentBar: int
     }
 
-    MainApp --> ArgumentProcessor
+    MainApp --> ArgumentProcessor : Uses
+    MainApp --> SortViewerFrame : Calls
     ArgumentProcessor --> ProcessedArgs : Creates
-    ArgumentProcessor --> UtilitiesCLI
-    ArgumentProcessor --> InputValidator
+    ArgumentProcessor --> UtilitiesCLI : Uses
+    ArgumentProcessor --> InputValidator : Validates
 
     SortHandler --> SortController : Uses
     SortHandler --> SortPanel : Uses
