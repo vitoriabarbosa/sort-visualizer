@@ -21,59 +21,83 @@ public class BubbleSort extends Sorting {
 
     /**
      * Ordena um array de inteiros usando o algoritmo de ordenação por bolha.
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
      *
      * @param array o array de inteiros a ser ordenado.
+     * @return o tempo de execução em milissegundos.
      */
     @Override
-    public void sort(int[] array) {
-        new Thread(() -> {
-            boolean swapped;
-            for (int i = 0; i < array.length - 1; i++) {
-                swapped = false;
-                for (int j = 0; j < array.length - i - 1; j++) {
-                    if (ascending ? array[j] > array[j + 1] : array[j] < array[j + 1]) {
-                        int temp = array[j];
-                        array[j] = array[j + 1];
-                        array[j + 1] = temp;
-                        swapped = true;
-                        panel.setIntArray(array);
-                        highlightBar(j);
-                        sleep();
-                    }
-                }
-                if (!swapped) break;
-            }
-            highlightBar(-1); // Reset highlight when done
-        }).start();
+    public long sort(int[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     /**
      * Ordena um array de caracteres usando o algoritmo de ordenação por bolha.
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
+     *
+     * @param array o array de caracteres a ser ordenado.
+     * @return o tempo de execução em milissegundos.
+     */
+    @Override
+    public long sort(char[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
+    /**
+     * Executa a ordenação por bolha em um array de inteiros.
+     *
+     * @param array o array de inteiros a ser ordenado.
+     */
+    @Override
+    protected void executeSort(int[] array) {
+        boolean swapped;
+        for (int i = 0; i < array.length - 1; i++) {
+            swapped = false;
+            for (int j = 0; j < array.length - i - 1; j++) {
+                if (ascending ? array[j] > array[j + 1] : array[j] < array[j + 1]) {
+                    // Troca os elementos em um array de inteiros.
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                    swapped = true;
+                    panel.setIntArray(array);
+                    highlightBar(j);  // Destaca o elemento trocado
+                    sleep();
+                }
+            }
+            if (!swapped) break;
+        }
+        highlightBar(-1); // Restaura a cor original das barras
+    }
+
+    /**
+     * Executa a ordenação por bolha em um array de caracteres.
      *
      * @param array o array de caracteres a ser ordenado.
      */
     @Override
-    public void sort(char[] array) {
-        new Thread(() -> {
-            boolean swapped;
-            for (int i = 0; i < array.length - 1; i++) {
-                swapped = false;
-                for (int j = 0; j < array.length - i - 1; j++) {
-                    if (ascending ? array[j] > array[j + 1] : array[j] < array[j + 1]) {
-                        char temp = array[j];
-                        array[j] = array[j + 1];
-                        array[j + 1] = temp;
-                        swapped = true;
-                        panel.setCharArray(array);
-                        highlightBar(j);
-                        sleep();
-                    }
+    protected void executeSort(char[] array) {
+        boolean swapped;
+        for (int i = 0; i < array.length - 1; i++) {
+            swapped = false;
+            for (int j = 0; j < array.length - i - 1; j++) {
+                if (ascending ? array[j] > array[j + 1] : array[j] < array[j + 1]) {
+                    // Troca os elementos em um array de caracteres.
+                    char temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                    swapped = true;
+                    panel.setCharArray(array);
+                    highlightBar(j);  // Destaca o elemento trocado
+                    sleep();
                 }
-                if (!swapped) break;
             }
-            highlightBar(-1); // Reset highlight when done
-        }).start();
+            if (!swapped) break;
+        }
+        highlightBar(-1); // Restaura a cor original das barras
     }
 }

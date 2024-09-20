@@ -21,28 +21,57 @@ public class QuickSort extends Sorting {
 
     /**
      * Ordena um array de inteiros usando o algoritmo de ordenação rápida (Quick Sort).
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
      *
      * @param array o array de inteiros a ser ordenado.
+     * @return o tempo de execução em milissegundos.
      */
     @Override
-    public void sort(int[] array) {
-        new Thread(() -> quickSortHelper(array, 0, array.length - 1)).start();
+    public long sort(int[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     /**
      * Ordena um array de caracteres usando o algoritmo de ordenação rápida (Quick Sort).
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
+     *
+     * @param array o array de caracteres a ser ordenado.
+     * @return o tempo de execução em milissegundos.
+     */
+    @Override
+    public long sort(char[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
+    /**
+     * Executa o algoritmo Quick Sort em um array de inteiros.
+     * Este método é chamado internamente para realizar a ordenação do array.
+     *
+     * @param array o array de inteiros a ser ordenado.
+     */
+    @Override
+    protected void executeSort(int[] array) {
+        quickSortHelper(array, 0, array.length - 1);
+    }
+
+    /**
+     * Executa o algoritmo Quick Sort em um array de caracteres.
+     * Este método é chamado internamente para realizar a ordenação do array.
      *
      * @param array o array de caracteres a ser ordenado.
      */
     @Override
-    public void sort(char[] array) {
-        new Thread(() -> quickSortHelper(array, 0, array.length - 1)).start();
+    protected void executeSort(char[] array) {
+        quickSortHelper(array, 0, array.length - 1);
     }
 
     /**
      * Método auxiliar para realizar a ordenação rápida em um array de inteiros.
+     * Este método particiona o array e chama recursivamente o Quick Sort nos subarrays.
      *
      * @param array o array de inteiros a ser ordenado.
      * @param low o índice inicial do subarray.
@@ -54,11 +83,12 @@ public class QuickSort extends Sorting {
             quickSortHelper(array, low, pi - 1);
             quickSortHelper(array, pi + 1, high);
         }
-        panel.setCurrentBar(-1); // Reset highlight when done
+        panel.setCurrentBar(-1); // Restaura a cor original das barras
     }
 
     /**
      * Método auxiliar para realizar a ordenação rápida em um array de caracteres.
+     * Este método particiona o array e chama recursivamente o Quick Sort nos subarrays.
      *
      * @param array o array de caracteres a ser ordenado.
      * @param low o índice inicial do subarray.
@@ -70,11 +100,12 @@ public class QuickSort extends Sorting {
             quickSortHelper(array, low, pi - 1);
             quickSortHelper(array, pi + 1, high);
         }
-        panel.setCurrentBar(-1); // Reset highlight when done
+        panel.setCurrentBar(-1); // Restaura a cor original das barras
     }
 
     /**
-     * Particiona o array de inteiros em torno de um pivô.
+     * Particiona um array de inteiros em torno de um pivô, utilizado no Quick Sort.
+     * Move todos os elementos menores que o pivô para a esquerda e os maiores para a direita.
      *
      * @param array o array de inteiros a ser particionado.
      * @param low o índice inicial do subarray.
@@ -91,7 +122,7 @@ public class QuickSort extends Sorting {
                 array[i] = array[j];
                 array[j] = temp;
                 panel.setIntArray(array);
-                highlightBar(j);
+                highlightBar(j); // Destaca o elemento sendo comparado
                 sleep();
             }
         }
@@ -99,13 +130,14 @@ public class QuickSort extends Sorting {
         array[i + 1] = array[high];
         array[high] = temp;
         panel.setIntArray(array);
-        highlightBar(high);
+        highlightBar(high); // Destaca a nova posição do pivô
         sleep();
         return i + 1;
     }
 
     /**
-     * Particiona o array de caracteres em torno de um pivô.
+     * Particiona um array de caracteres em torno de um pivô, utilizado no Quick Sort.
+     * Move todos os elementos menores que o pivô para a esquerda e os maiores para a direita.
      *
      * @param array o array de caracteres a ser particionado.
      * @param low o índice inicial do subarray.
@@ -130,7 +162,7 @@ public class QuickSort extends Sorting {
         array[i + 1] = array[high];
         array[high] = temp;
         panel.setCharArray(array);
-        highlightBar(i + 1); // Highlight the new position of pivot
+        highlightBar(i + 1); // Destaca a nova posição do pivô
         sleep();
         return i + 1;
     }

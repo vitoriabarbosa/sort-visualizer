@@ -26,18 +26,46 @@ public abstract class Sorting {
     }
 
     /**
-     * Método abstrato para ordenar um array de inteiros.
+     * Método para ordenar um array de inteiros e medir o tempo de execução.
+     *
+     * @param array o array de inteiros a ser ordenado.
+     * @return o tempo de execução em milissegundos.
+     */
+    public long sort(int[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array); // Método específico de cada algoritmo.
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
+    /**
+     * Método para ordenar um array de caracteres e medir o tempo de execução.
+     *
+     * @param array o array de caracteres a ser ordenado.
+     * @return o tempo de execução em milissegundos.
+     */
+    public long sort(char[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array); // Método específico de cada algoritmo.
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
+    /**
+     * Método abstrato específico de cada algoritmo para ordenar um array de inteiros.
+     * As subclasses devem implementar esse método.
      *
      * @param array o array de inteiros a ser ordenado.
      */
-    public abstract void sort(int[] array);
+    protected abstract void executeSort(int[] array);
 
     /**
-     * Método abstrato para ordenar um array de caracteres.
+     * Método abstrato específico de cada algoritmo para ordenar um array de caracteres.
+     * As subclasses devem implementar esse método.
      *
      * @param array o array de caracteres a ser ordenado.
      */
-    public abstract void sort(char[] array);
+    protected abstract void executeSort(char[] array);
 
     /**
      * Destaca a barra correspondente ao índice especificado no painel de visualização.

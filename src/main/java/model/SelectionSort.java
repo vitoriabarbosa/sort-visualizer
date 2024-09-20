@@ -21,59 +21,81 @@ public class SelectionSort extends Sorting {
 
     /**
      * Ordena um array de inteiros usando o algoritmo de ordenação por seleção (Selection Sort).
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
      *
      * @param array o array de inteiros a ser ordenado.
+     * @return o tempo de execução em milissegundos.
      */
     @Override
-    public void sort(int[] array) {
-        new Thread(() -> {
-            for (int i = 0; i < array.length - 1; i++) {
-                int minIndex = i;
-                for (int j = i + 1; j < array.length; j++) {
-                    highlightBar(j);
-                    if (ascending ? array[j] < array[minIndex] : array[j] > array[minIndex]) {
-                        minIndex = j;
-                    }
-                    sleep();
-                }
-                int temp = array[minIndex];
-                array[minIndex] = array[i];
-                array[i] = temp;
-                panel.setIntArray(array);
-                highlightBar(i);
-                sleep();
-            }
-            highlightBar(-1); // Reset highlight when done
-        }).start();
+    public long sort(int[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     /**
      * Ordena um array de caracteres usando o algoritmo de ordenação por seleção (Selection Sort).
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
+     *
+     * @param array o array de caracteres a ser ordenado.
+     * @return o tempo de execução em milissegundos.
+     */
+    @Override
+    public long sort(char[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
+    /**
+     * Ordena um array de inteiros usando o algoritmo de ordenação por seleção (Selection Sort).
+     *
+     * @param array o array de inteiros a ser ordenado.
+     */
+    @Override
+    protected void executeSort(int[] array) {
+        for (int i = 0; i < array.length - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < array.length; j++) {
+                highlightBar(j); // Destaca o elemento sendo comparado
+                if (ascending ? array[j] < array[minIndex] : array[j] > array[minIndex]) {
+                    minIndex = j;
+                }
+                sleep();
+            }
+            int temp = array[minIndex];
+            array[minIndex] = array[i];
+            array[i] = temp;
+            panel.setIntArray(array);
+            highlightBar(i); // Destaca o elemento trocado
+            sleep();
+        }
+        highlightBar(-1); // Restaura a cor original das barras
+    }
+
+    /**
+     * Ordena um array de caracteres usando o algoritmo de ordenação por seleção (Selection Sort).
      *
      * @param array o array de caracteres a ser ordenado.
      */
     @Override
-    public void sort(char[] array) {
-        new Thread(() -> {
-            for (int i = 0; i < array.length - 1; i++) {
-                int minIndex = i;
-                for (int j = i + 1; j < array.length; j++) {
-                    highlightBar(j);
-                    if (ascending ? array[j] < array[minIndex] : array[j] > array[minIndex]) {
-                        minIndex = j;
-                    }
-                    sleep();
+    protected void executeSort(char[] array) {
+        for (int i = 0; i < array.length - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < array.length; j++) {
+                highlightBar(j); // Destaca o elemento sendo comparado
+                if (ascending ? array[j] < array[minIndex] : array[j] > array[minIndex]) {
+                    minIndex = j;
                 }
-                char temp = array[minIndex];
-                array[minIndex] = array[i];
-                array[i] = temp;
-                panel.setCharArray(array);
-                highlightBar(i);
                 sleep();
             }
-            highlightBar(-1); // Reset highlight when done
-        }).start();
+            char temp = array[minIndex];
+            array[minIndex] = array[i];
+            array[i] = temp;
+            panel.setCharArray(array);
+            highlightBar(i); // Destaca o elemento trocado
+            sleep();
+        }
+        highlightBar(-1); // Restaura a cor original das barras
     }
 }

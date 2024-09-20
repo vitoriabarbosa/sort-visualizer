@@ -21,57 +21,79 @@ public class InsertionSort extends Sorting {
 
     /**
      * Ordena um array de inteiros usando o algoritmo de ordenação por inserção.
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
      *
      * @param array o array de inteiros a ser ordenado.
+     * @return o tempo de execução da ordenação em milissegundos.
      */
     @Override
-    public void sort(int[] array) {
-        new Thread(() -> {
-            for (int i = 1; i < array.length; i++) {
-                int key = array[i];
-                int j = i - 1;
-                while (j >= 0 && (ascending ? array[j] > key : array[j] < key)) {
-                    array[j + 1] = array[j];
-                    j--;
-                    panel.setIntArray(array);
-                    highlightBar(j + 1);
-                    sleep();
-                }
-                array[j + 1] = key;
-                panel.setIntArray(array);
-                highlightBar(i);
-                sleep();
-            }
-            highlightBar(-1); // Reset highlight when done
-        }).start();
+    public long sort(int[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     /**
      * Ordena um array de caracteres usando o algoritmo de ordenação por inserção.
-     * A ordenação é realizada em um novo thread para permitir a visualização em tempo real.
+     *
+     * @param array o array de caracteres a ser ordenado.
+     * @return o tempo de execução da ordenação em milissegundos.
+     */
+    @Override
+    public long sort(char[] array) {
+        long startTime = System.currentTimeMillis();
+        executeSort(array);
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
+    }
+
+    /**
+     * Executa a ordenação por inserção em um array de inteiros.
+     *
+     * @param array o array de inteiros a ser ordenado.
+     */
+    @Override
+    protected void executeSort(int[] array) {
+        for (int i = 1; i < array.length; i++) {
+            int key = array[i];
+            int j = i - 1;
+            while (j >= 0 && (ascending ? array[j] > key : array[j] < key)) {
+                array[j + 1] = array[j];
+                j--;
+                panel.setIntArray(array);
+                highlightBar(j + 1); // Destaca a barra atual
+                sleep();
+            }
+            array[j + 1] = key;
+            panel.setIntArray(array);
+            highlightBar(i);
+            sleep();
+        }
+        highlightBar(-1); // Restaura a cor original das barras
+    }
+
+    /**
+     * Executa a ordenação por inserção em um array de caracteres.
      *
      * @param array o array de caracteres a ser ordenado.
      */
     @Override
-    public void sort(char[] array) {
-        new Thread(() -> {
-            for (int i = 1; i < array.length; i++) {
-                char key = array[i];
-                int j = i - 1;
-                while (j >= 0 && (ascending ? array[j] > key : array[j] < key)) {
-                    array[j + 1] = array[j];
-                    j--;
-                    panel.setCharArray(array);
-                    highlightBar(j + 1);
-                    sleep();
-                }
-                array[j + 1] = key;
+    protected void executeSort(char[] array) {
+        for (int i = 1; i < array.length; i++) {
+            char key = array[i];
+            int j = i - 1;
+            while (j >= 0 && (ascending ? array[j] > key : array[j] < key)) {
+                array[j + 1] = array[j];
+                j--;
                 panel.setCharArray(array);
-                highlightBar(i);
+                highlightBar(j + 1);  // Destaca a barra atual
                 sleep();
             }
-            highlightBar(-1); // Reset highlight when done
-        }).start();
+            array[j + 1] = key;
+            panel.setCharArray(array);
+            highlightBar(i);
+            sleep();
+        }
+        highlightBar(-1); // Restaura a cor original das barras
     }
 }

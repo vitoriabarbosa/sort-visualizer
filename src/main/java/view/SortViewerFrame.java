@@ -8,12 +8,11 @@ import main.java.utils.SortHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Objects;
 
 /**
- * A classe {@code SortViewerFrame} é uma janela principal da aplicação que permite ao usuário visualizar e controlar
- * a execução de algoritmos de ordenação. Ela fornece uma interface gráfica para selecionar algoritmos, tipos de dados,
- * ordem de ordenação, e outros parâmetros, e para iniciar a ordenação.
+ * A classe {@code SortViewerFrame} é a janela principal da aplicação que permite ao usuário visualizar e controlar
+ * a execução de algoritmos de ordenação. Fornece uma interface gráfica para selecionar algoritmos, tipos de dados,
+ * ordem de ordenação e outros parâmetros, além de iniciar a ordenação.
  */
 public class SortViewerFrame extends JFrame {
     private SortPanel panel;
@@ -29,6 +28,14 @@ public class SortViewerFrame extends JFrame {
     /**
      * Construtor para inicializar a janela do visualizador de ordenação.
      * Configura o painel principal, os componentes de controle e adiciona ouvintes de eventos para os botões.
+     *
+     * @param algorithm     O algoritmo de ordenação selecionado.
+     * @param type          O tipo de dado (numérico ou caractere) a ser ordenado.
+     * @param order         A ordem de ordenação (crescente ou decrescente).
+     * @param valueList     O modo de geração da lista de valores (aleatório ou manual).
+     * @param numElements   O número de elementos a serem ordenados.
+     * @param manualValues  Os valores inseridos manualmente, caso selecionado.
+     * @param pauseDuration A duração da pausa entre cada iteração do algoritmo de ordenação.
      */
     public SortViewerFrame(String algorithm, String type, String order, String valueList, int numElements, String manualValues, int pauseDuration) {
         setTitle("Sorting Algorithm Viewer");
@@ -49,7 +56,7 @@ public class SortViewerFrame extends JFrame {
         controlPanel.add(sizeField);
 
         algorithmBox = new JComboBox<>(new String[]{"Selection Sort (S)", "Bubble Sort (B)", "Insertion Sort (I)", "Quick Sort (Q)"});
-        controlPanel.add(new JLabel("Algorítmos:"));
+        controlPanel.add(new JLabel("Algoritmos:"));
         controlPanel.add(algorithmBox);
 
         typeBox = new JComboBox<>(new String[]{"Numérico (N)", "Caractere (C)"});
@@ -65,7 +72,7 @@ public class SortViewerFrame extends JFrame {
         controlPanel.add(valueListBox);
 
         manualInputField = new JTextField(manualValues, 20);
-        manualInputField.setEnabled("Manual (M)".equals(valueList)); // habilita se for "Manual (M)"
+        manualInputField.setEnabled("Manual (M)".equals(valueList)); // Habilita o input se for "Manual (M)"
         controlPanel.add(new JLabel("Valores:"));
         controlPanel.add(manualInputField);
 
@@ -91,6 +98,12 @@ public class SortViewerFrame extends JFrame {
     /**
      * Inicia a ordenação com os parâmetros atualmente selecionados na interface gráfica.
      * Esse método é chamado quando o botão "Start" é pressionado.
+     * <p>
+     * Ele extrai os parâmetros selecionados pelo usuário, como o algoritmo de ordenação, o tipo de dado, a ordem de
+     * ordenação, e a quantidade de elementos a serem ordenados. Dependendo do tipo de dado selecionado (numérico ou
+     * caractere) e se a lista será gerada manualmente ou aleatoriamente, a ordenação será iniciada.
+     * <p>
+     * Durante a execução, o tempo de processamento é medido, e o resultado final, incluindo o tempo total, é exibido.
      */
     private void startSorting() {
         try {
@@ -104,31 +117,47 @@ public class SortViewerFrame extends JFrame {
             control = new SortController(panel, pauseDuration, order);
             SortHandler sortHandler = new SortHandler(control, panel);
 
-            if ("Numérico (N)".equals(type)) {
-                if (numElements > 100) {
-                    JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+            // Define uma tarefa de ordenação que será executada em uma nova thread
+            Runnable sortingTask = () -> {
+                long startTime = System.currentTimeMillis();
+                try {
+                    if ("Numérico (N)".equals(type)) {
+                        if (numElements > 100) {
+                            JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        int[] array;
+                        if ("Manual (M)".equals(valueList)) {
+                            array = InputValidator.manualInputIntArray(manualInputField.getText());
+                        } else array = DataGenerator.randomNumbers(numElements);
+                        sortHandler.sort(algorithm, array);
+                    } else {
+                        if (numElements > 100) {
+                            JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        char[] array;
+                        if ("Manual (M)".equals(valueList)) {
+                            array = InputValidator.manualInputCharArray(manualInputField.getText());
+                        } else array = DataGenerator.randomChars(numElements);
+                        sortHandler.sort(algorithm, array);
+                    }
+
+                    long endTime = System.currentTimeMillis();
+                    long runtime = endTime - startTime;
+
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(SortViewerFrame.this,
+                                "Tempo de execução: " + (runtime / 1000) + " s", "Tempo de Execução", JOptionPane.INFORMATION_MESSAGE);
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace(); // Exceção genérica para exibir a mensagem em casos de erros
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(this, "Erro durante a ordenação: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                    });
                 }
-                int[] array;
-                if ("Manual (M)".equals(valueList)) {
-                    array = InputValidator.manualInputIntArray(manualInputField.getText());
-                } else {
-                    array = DataGenerator.randomNumbers(numElements);
-                }
-                sortHandler.sort(algorithm, array);
-            } else {
-                if (numElements > 100) {
-                    JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                char[] array;
-                if ("Manual (M)".equals(valueList)) {
-                    array = InputValidator.manualInputCharArray(manualInputField.getText());
-                } else {
-                    array = DataGenerator.randomChars(numElements);
-                }
-                sortHandler.sort(algorithm, array);
-            }
+            };
+            new Thread(sortingTask).start(); // Executa a tarefa em uma nova thread separada para não bloquear a interface gráfica
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Por favor, insira um número válido.", "Erro de Entrada", JOptionPane.ERROR_MESSAGE);
         }
