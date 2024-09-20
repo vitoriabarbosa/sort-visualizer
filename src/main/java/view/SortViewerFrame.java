@@ -21,14 +21,16 @@ public class SortViewerFrame extends JFrame {
     private JComboBox<String> algorithmBox;
     private JComboBox<String> typeBox;
     private JComboBox<String> orderBox;
+    private JComboBox<String> valueListBox;
     private JTextField sizeField;
     private JTextField pauseField;
+    private JTextField manualInputField;
 
     /**
      * Construtor para inicializar a janela do visualizador de ordenação.
      * Configura o painel principal, os componentes de controle e adiciona ouvintes de eventos para os botões.
      */
-    public SortViewerFrame() {
+    public SortViewerFrame(String algorithm, String type, String order, String valueList, int numElements, String manualValues, int pauseDuration) {
         setTitle("Sorting Algorithm Viewer");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,7 +45,7 @@ public class SortViewerFrame extends JFrame {
         add(controlPanel, BorderLayout.SOUTH);
 
         controlPanel.add(new JLabel("Número de Elementos:"));
-        sizeField = new JTextField("20", 5);    // número de elementos "padrão"
+        sizeField = new JTextField(String.valueOf(numElements), 5);
         controlPanel.add(sizeField);
 
         algorithmBox = new JComboBox<>(new String[]{"Selection Sort (S)", "Bubble Sort (B)", "Insertion Sort (I)", "Quick Sort (Q)"});
@@ -58,9 +60,25 @@ public class SortViewerFrame extends JFrame {
         controlPanel.add(new JLabel("Ordem:"));
         controlPanel.add(orderBox);
 
-        pauseField = new JTextField("100", 5);  // velocidade "padrão"
+        valueListBox = new JComboBox<>(new String[]{"Aleatório (R)", "Manual (M)"});
+        controlPanel.add(new JLabel("Tipo Valor da Lista:"));
+        controlPanel.add(valueListBox);
+
+        manualInputField = new JTextField(manualValues, 20);
+        manualInputField.setEnabled("Manual (M)".equals(valueList)); // habilita se for "Manual (M)"
+        controlPanel.add(new JLabel("Valores:"));
+        controlPanel.add(manualInputField);
+
+        pauseField = new JTextField(String.valueOf(pauseDuration), 5);
         controlPanel.add(new JLabel("Pausa (ms):"));
         controlPanel.add(pauseField);
+
+        algorithmBox.setSelectedItem(InputValidator.getAlgorithmFullName(algorithm));
+        typeBox.setSelectedItem(InputValidator.getTypeFullName(type));
+        orderBox.setSelectedItem(InputValidator.getOrderFullName(order.toUpperCase()));
+        valueListBox.setSelectedItem(InputValidator.getValueListFullName(valueList));
+
+        valueListBox.addActionListener(e -> manualInputField.setEnabled("Manual (M)".equals(valueListBox.getSelectedItem())));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         ButtonUtil startButton = new ButtonUtil("Start", e -> startSorting());
@@ -68,48 +86,11 @@ public class SortViewerFrame extends JFrame {
         buttonPanel.add(Box.createHorizontalStrut(40));
         buttonPanel.add(startButton);
         controlPanel.add(buttonPanel);
-        showMenu();
     }
 
     /**
-     * Exibe um menu para que o usuário insira os parâmetros desejados para o algoritmo de ordenação.
-     * Atualiza os componentes de seleção de algoritmos, tipos e ordens com os valores fornecidos pelo usuário.
-     */
-    private void showMenu() {
-        JPanel menuPanel = new JPanel(new GridLayout(5, 2, 10, 10));
-        JTextField algorithmField = new JTextField();
-        JTextField typeField = new JTextField();
-        JTextField orderField = new JTextField();
-
-        menuPanel.add(new JLabel("Algorítmo (S/B/I/Q):"));
-        menuPanel.add(algorithmField);
-
-        menuPanel.add(new JLabel("Tipo de Lista (N/C):"));
-        menuPanel.add(typeField);
-
-        menuPanel.add(new JLabel("Ordem (AZ/ZA):"));
-        menuPanel.add(orderField);
-
-        int result = JOptionPane.showConfirmDialog(this, menuPanel, "Menu", JOptionPane.OK_CANCEL_OPTION);
-        if (result == JOptionPane.OK_OPTION) {
-            String algorithm = algorithmField.getText().trim().toUpperCase();
-            String type = typeField.getText().trim().toUpperCase();
-            String order = orderField.getText().trim().toUpperCase();
-
-            if (!InputValidator.validateInput(algorithm, type, order)) {
-                JOptionPane.showMessageDialog(this, "Input inválido. Entre com os valores corretos.", "Error", JOptionPane.ERROR_MESSAGE);
-                showMenu();
-                return;
-            }
-
-            algorithmBox.setSelectedItem(InputValidator.getAlgorithmFullName(algorithm));
-            typeBox.setSelectedItem(InputValidator.getTypeFullName(type));
-            orderBox.setSelectedItem(InputValidator.getOrderFullName(order));
-        }
-    }
-
-    /**
-     * Inicia a ordenação com base nas configurações fornecidas pelo usuário e no tipo de dados selecionado.
+     * Inicia a ordenação com os parâmetros atualmente selecionados na interface gráfica.
+     * Esse método é chamado quando o botão "Start" é pressionado.
      */
     private void startSorting() {
         try {
@@ -118,6 +99,7 @@ public class SortViewerFrame extends JFrame {
             String algorithm = (String) algorithmBox.getSelectedItem();
             String type = (String) typeBox.getSelectedItem();
             String order = (String) orderBox.getSelectedItem();
+            String valueList = (String) valueListBox.getSelectedItem();
 
             control = new SortController(panel, pauseDuration, order);
             SortHandler sortHandler = new SortHandler(control, panel);
@@ -127,14 +109,24 @@ public class SortViewerFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                int[] array = DataGenerator.randomNumbers(numElements);
+                int[] array;
+                if ("Manual (M)".equals(valueList)) {
+                    array = InputValidator.manualInputIntArray(manualInputField.getText());
+                } else {
+                    array = DataGenerator.randomNumbers(numElements);
+                }
                 sortHandler.sort(algorithm, array);
             } else {
                 if (numElements > 100) {
                     JOptionPane.showMessageDialog(this, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                char[] array = DataGenerator.randomChars(numElements);
+                char[] array;
+                if ("Manual (M)".equals(valueList)) {
+                    array = InputValidator.manualInputCharArray(manualInputField.getText());
+                } else {
+                    array = DataGenerator.randomChars(numElements);
+                }
                 sortHandler.sort(algorithm, array);
             }
         } catch (NumberFormatException e) {

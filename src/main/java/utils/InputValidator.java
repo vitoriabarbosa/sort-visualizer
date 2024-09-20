@@ -6,8 +6,8 @@ package main.java.utils;
  */
 public class InputValidator {
 
-    public static boolean validateInput(String algorithm, String type, String order) {
-        return (algorithm.matches("[SBIQ]") && type.matches("[NC]") && order.matches("AZ|ZA"));
+    public static boolean validateInput(String algorithm, String type, String order, String valueList) {
+        return (algorithm.matches("[SBIQ]") && type.matches("[NC]") && order.matches("AZ|ZA") && valueList.matches("[RM]"));
     }
 
     public static String getAlgorithmFullName(String algorithm) {
@@ -34,5 +34,32 @@ public class InputValidator {
             case "ZA" -> "Decrescente (ZA)";
             default -> null;
         };
+    }
+
+
+    public static String getValueListFullName(String valueList) {
+        return switch (valueList) {
+            case "R" -> "Aleatório (R)";
+            case "M" -> "Manual (M)";
+            default -> null;
+        };
+    }
+
+    public static int[] manualInputIntArray(String input) {
+        String[] parts = input.split(",");
+        int[] array = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            array[i] = Integer.parseInt(parts[i].trim());
+        }
+        return array;
+    }
+
+    public static char[] manualInputCharArray(String input) {
+        String[] parts = input.split(",");
+        char[] array = new char[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            array[i] = parts[i].trim().charAt(0);
+        }
+        return array;
     }
 }
